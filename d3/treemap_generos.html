@@ -1,0 +1,64 @@
+
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<style>
+  body { margin:0; font-family: "Segoe UI", system-ui, sans-serif; color:#1f2937; }
+  #barra { display:flex; align-items:center; gap:10px; padding:4px 2px 8px; font-size:13px; }
+  select { padding:3px 6px; border:1px solid #cbd5e1; border-radius:6px; font-size:13px; }
+  #tip { position:absolute; pointer-events:none; background:#111827; color:#fff; padding:6px 9px;
+         border-radius:6px; font-size:12px; line-height:1.4; opacity:0; transition:opacity .1s; }
+  #leyenda { margin-left:auto; display:flex; align-items:center; gap:6px; font-size:12px; }
+  #grad { width:120px; height:10px; border-radius:3px; }
+  svg text { pointer-events:none; }
+</style></head>
+<body>
+<div id="barra">
+  <b>StreamView · Géneros por volumen (tamaño = títulos)</b>
+  <span>Color:</span>
+  <select id="metrica">
+    <option value="calificacion">Calificación promedio</option>
+    <option value="popularidad">Popularidad promedio</option>
+  </select>
+  <div id="leyenda"><span id="lmin"></span><div id="grad"></div><span id="lmax"></span></div>
+</div>
+<div id="tip"></div>
+<svg id="lienzo" width="100%" height="520" viewBox="0 0 1000 520" preserveAspectRatio="xMidYMid meet"></svg>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script>
+const datos = [{"genero": "Action", "titulos": 3239, "calificacion": 6.247734833659491, "popularidad": 32.21445754862612}, {"genero": "Action & Adventure", "titulos": 1988, "calificacion": 7.430908179012346, "popularidad": 67.40017002012073}, {"genero": "Adventure", "titulos": 1768, "calificacion": 6.472211209439528, "popularidad": 35.46935407239819}, {"genero": "Animation", "titulos": 4070, "calificacion": 7.183115789473684, "popularidad": 45.54672432432432}, {"genero": "Comedy", "titulos": 9106, "calificacion": 6.65119807574832, "popularidad": 42.99929497034922}, {"genero": "Crime", "titulos": 3203, "calificacion": 6.711384434884629, "popularidad": 40.61635060880425}, {"genero": "Documentary", "titulos": 1825, "calificacion": 7.228580745341615, "popularidad": 28.39990410958904}, {"genero": "Drama", "titulos": 14773, "calificacion": 6.818713363191334, "popularidad": 41.964502064577275}, {"genero": "Family", "titulos": 3014, "calificacion": 6.845493582887701, "popularidad": 55.567252820172534}, {"genero": "Fantasy", "titulos": 1450, "calificacion": 6.507301610541727, "popularidad": 25.23815517241379}, {"genero": "History", "titulos": 732, "calificacion": 6.783191218130312, "popularidad": 16.10071174863388}, {"genero": "Horror", "titulos": 2425, "calificacion": 5.738857336343115, "popularidad": 21.44715175257732}, {"genero": "Kids", "titulos": 835, "calificacion": 7.279333333333333, "popularidad": 66.36234371257486}, {"genero": "Music", "titulos": 488, "calificacion": 6.9708459770114946, "popularidad": 14.913776639344261}, {"genero": "Mystery", "titulos": 2575, "calificacion": 6.67110593654043, "popularidad": 37.39621553398059}, {"genero": "News", "titulos": 113, "calificacion": 6.495571428571429, "popularidad": 102.00029203539823}, {"genero": "Reality", "titulos": 1631, "calificacion": 6.944013054830287, "popularidad": 79.30901532801963}, {"genero": "Romance", "titulos": 2571, "calificacion": 6.453671455938697, "popularidad": 19.166187475690393}, {"genero": "Sci-Fi & Fantasy", "titulos": 1958, "calificacion": 7.44784564254062, "popularidad": 61.434432584269665}, {"genero": "Science Fiction", "titulos": 1454, "calificacion": 6.133059077809798, "popularidad": 34.28880949105915}, {"genero": "Soap", "titulos": 631, "calificacion": 7.136359605911331, "popularidad": 155.4580142630745}, {"genero": "TV Movie", "titulos": 628, "calificacion": 6.260889983579639, "popularidad": 10.443264331210191}, {"genero": "Talk", "titulos": 654, "calificacion": 6.551369565217391, "popularidad": 130.61215749235473}, {"genero": "Thriller", "titulos": 3769, "calificacion": 6.049222664015904, "popularidad": 24.490539665693817}, {"genero": "War", "titulos": 420, "calificacion": 6.637175308641975, "popularidad": 22.301735714285712}, {"genero": "War & Politics", "titulos": 323, "calificacion": 7.4154044117647056, "popularidad": 51.89260061919505}, {"genero": "Western", "titulos": 154, "calificacion": 6.378856164383562, "popularidad": 31.604006493506493}];
+const W = 1000, H = 520;
+const fmt = d3.format(",.0f");
+const svg = d3.select("#lienzo");
+const tip = d3.select("#tip");
+
+const raiz = d3.hierarchy({ children: datos }).sum(d => d.titulos).sort((a, b) => b.value - a.value);
+d3.treemap().size([W, H]).paddingInner(2).round(true)(raiz);
+
+const nodos = svg.selectAll("g").data(raiz.leaves()).join("g")
+  .attr("transform", d => `translate(${d.x0},${d.y0})`);
+const rects = nodos.append("rect")
+  .attr("width", d => d.x1 - d.x0).attr("height", d => d.y1 - d.y0).attr("rx", 3);
+nodos.append("text").attr("x", 6).attr("y", 16).attr("font-size", 12).attr("font-weight", 600)
+  .text(d => (d.x1 - d.x0 > 70 && d.y1 - d.y0 > 24) ? d.data.genero : "");
+nodos.append("text").attr("x", 6).attr("y", 31).attr("font-size", 11)
+  .text(d => (d.x1 - d.x0 > 70 && d.y1 - d.y0 > 40) ? fmt(d.data.titulos) + " títulos" : "");
+
+nodos.on("mousemove", (ev, d) => {
+  tip.style("opacity", 1).style("left", (ev.pageX + 12) + "px").style("top", (ev.pageY + 12) + "px")
+     .html(`<b>${d.data.genero}</b><br>${fmt(d.data.titulos)} títulos<br>` +
+           `Calificación prom.: ${d.data.calificacion.toFixed(2)}<br>Popularidad prom.: ${d.data.popularidad.toFixed(1)}`);
+}).on("mouseleave", () => tip.style("opacity", 0));
+
+function pintar(metrica) {
+  const vals = datos.map(d => d[metrica]);
+  const esc = d3.scaleSequential(d3.interpolateBlues).domain([d3.min(vals) * 0.9, d3.max(vals)]);
+  rects.transition().duration(300).attr("fill", d => esc(d.data[metrica]));
+  nodos.selectAll("text").attr("fill", d => esc(d.data[metrica]) && d3.hsl(esc(d.data[metrica])).l < 0.55 ? "#fff" : "#111827");
+  const r = metrica === "calificacion" ? 2 : 1;
+  d3.select("#lmin").text(d3.min(vals).toFixed(r));
+  d3.select("#lmax").text(d3.max(vals).toFixed(r));
+  d3.select("#grad").style("background", `linear-gradient(to right, ${esc(d3.min(vals))}, ${esc(d3.max(vals))})`);
+}
+d3.select("#metrica").on("change", e => pintar(e.target.value));
+pintar("calificacion");
+</script></body></html>
