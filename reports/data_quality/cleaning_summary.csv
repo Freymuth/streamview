@@ -1,0 +1,21 @@
+campo,accion,justificacion
+rating (TV),eliminada,idéntica a vote_average en 100% de los casos
+rating (Movies),eliminada,idéntica a vote_average en 100% de los casos
+duration (Movies),eliminada,100% de valores nulos
+date_added,convertida,texto -> datetime
+show_id duplicados (TV),9 eliminados,keep='first'
+show_id duplicados (Movies),0 eliminados,keep='first'
+director (nulos),TV: 10960 / Movies: 132,rellenados con 'Desconocido'
+cast (nulos),TV: 1156 / Movies: 204,rellenados con 'Desconocido'
+country (nulos),TV: 1795 / Movies: 466,rellenados con 'Desconocido'
+genres (nulos),TV: 972 / Movies: 107,rellenados con 'Desconocido'
+description (nulos),TV: 3203 / Movies: 132,rellenados con 'Desconocido'
+uid,creada,show_id se repite entre Movies y TV Shows; uid = M/T + show_id es clave única
+calificacion,11660 títulos con < 10 votos -> NA,vote_average solo es confiable con vote_count >= 10; los dashboards EA2 promedian esta columna (vote_average original se conserva)
+anio_incorporacion / idioma_nombre,creadas,año de date_added para 'incorporación por año'; nombre legible del código de idioma
+budget/revenue == 0,11153 / 10355 -> NA,"0 significa 'dato no disponible', no costo/ingreso cero"
+popularity_norm,creada,normalización 0-1 por tipo (Movie/TV Show)
+popularity_pct,creada,percentil de popularidad dentro de su tipo (0-1); permite comparar géneros/países entre películas y series
+catalogo_financiero,3540 de 31991 títulos,filtrado: budget y revenue conocidos (regla de negocio)
+roi,creada,ROI = revenue / budget (definición oficial del caso)
+presupuesto_realista,15 títulos marcados,"budget < USD 10,000 se marca para excluirlo de rankings de ROI"
