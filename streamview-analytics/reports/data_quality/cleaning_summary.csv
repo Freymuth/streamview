@@ -1,0 +1,16 @@
+campo,accion,justificacion
+rating (TV),eliminada,idéntica a vote_average en 100% de los casos
+rating (Movies),eliminada,idéntica a vote_average en 100% de los casos
+duration (Movies),eliminada,100% de valores nulos
+date_added,convertida,texto -> datetime
+show_id duplicados (TV),9 eliminados,keep='first'
+show_id duplicados (Movies),0 eliminados,keep='first'
+director (nulos),TV: 10960 / Movies: 132,rellenados con 'Desconocido'
+cast (nulos),TV: 1156 / Movies: 204,rellenados con 'Desconocido'
+country (nulos),TV: 1795 / Movies: 466,rellenados con 'Desconocido'
+genres (nulos),TV: 972 / Movies: 107,rellenados con 'Desconocido'
+description (nulos),TV: 3203 / Movies: 132,rellenados con 'Desconocido'
+budget/revenue == 0,11153 / 10355 -> NA,"0 significa 'dato no disponible', no costo/ingreso cero"
+popularity_norm,creada,normalización 0-1 por tipo (Movie/TV Show)
+catalogo_financiero,3540 de 31991 títulos,filtrado: budget y revenue conocidos (regla de negocio)
+roi,creada,ROI = revenue / budget (definición oficial del caso)
