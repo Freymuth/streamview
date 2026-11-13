@@ -6,3 +6,10 @@ plotly>=5.20
 streamlit>=1.50
 dash>=2.17
 pycountry>=23.12
+
+# EA3: notebook y generación de PDF
+jupyterlab
+ipykernel
+reportlab
+pillow
+scipy>=1.10

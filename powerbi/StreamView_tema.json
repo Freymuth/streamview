@@ -1,0 +1,66 @@
+{
+  "name": "StreamView",
+  "dataColors": [
+    "#2563EB",
+    "#F97316",
+    "#06B6D4",
+    "#8B5CF6",
+    "#FBBF24",
+    "#EF4444",
+    "#22C55E",
+    "#6B7280"
+  ],
+  "background": "#FFFFFF",
+  "foreground": "#111827",
+  "tableAccent": "#2563EB",
+  "good": "#22C55E",
+  "neutral": "#FBBF24",
+  "bad": "#EF4444",
+  "maximum": "#1D4ED8",
+  "center": "#93C5FD",
+  "minimum": "#DBEAFE",
+  "textClasses": {
+    "title": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 14,
+      "color": "#111827"
+    },
+    "label": {
+      "fontFace": "Segoe UI",
+      "fontSize": 11,
+      "color": "#374151"
+    },
+    "callout": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 28,
+      "color": "#111827"
+    },
+    "header": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 12,
+      "color": "#111827"
+    }
+  },
+  "visualStyles": {
+    "*": {
+      "*": {
+        "title": [
+          {
+            "show": true,
+            "fontColor": {
+              "solid": {
+                "color": "#111827"
+              }
+            },
+            "fontSize": 14
+          }
+        ],
+        "border": [
+          {
+            "show": false
+          }
+        ]
+      }
+    }
+  }
+}

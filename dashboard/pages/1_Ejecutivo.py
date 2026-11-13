@@ -50,6 +50,20 @@ j.metric(
     help="Promedio solo de títulos con 10 o más votos (con menos, la nota no es confiable).",
 )
 
+# ------------------------------------------------ Lectura rápida (EA3) ----
+# Mejora EA3: el directorio lee primero la conclusión y luego el detalle (storytelling).
+_top_gen = generos["genero"].value_counts()
+_top_pais = paises[paises["pais"] != "Desconocido"]["pais"].value_counts()
+_cal_tipo = df.groupby("type")["calificacion"].mean()
+_txt = [f"**{u.n(len(df))} títulos** con los filtros actuales."]
+if len(_top_gen):
+    _txt.append(f"Género predominante: **{_top_gen.index[0]}** ({u.n(_top_gen.iloc[0])} títulos).")
+if len(_top_pais):
+    _txt.append(f"País líder: **{_top_pais.index[0]}** ({u.n(_top_pais.iloc[0])}).")
+if len(_cal_tipo.dropna()) == 2:
+    _txt.append(f"Calificación promedio: películas {u.d(_cal_tipo['Movie'], 2)} vs. series {u.d(_cal_tipo['TV Show'], 2)}.")
+st.info("💡 **Lectura rápida** · " + " ".join(_txt))
+
 st.divider()
 
 # ----------------------------------------- Evolución + película vs serie ----
@@ -136,3 +150,13 @@ st.markdown(
 """
 )
 st.caption("Un título puede tener varios géneros o países: en esos gráficos se cuenta una vez por cada uno.")
+
+# --------------------------------------------------- Exportar (EA3) ---------
+st.divider()
+st.download_button(
+    "⬇️ Descargar los títulos filtrados (CSV)",
+    data=df.drop(columns=[c for c in df.columns if c.startswith("lista_")]).to_csv(index=False).encode("utf-8"),
+    file_name="streamview_titulos_filtrados.csv",
+    mime="text/csv",
+    help="Exporta exactamente lo que ves, con los filtros activos, para trabajar en Excel o Power BI.",
+)

@@ -25,7 +25,18 @@ Ejemplo: `feat(ejecutivo): agrega mapa coroplético de producciones`
 | 6 | `feature/dash-financiero` | `dash_app/app.py` | Dash |
 | 7 | `feature/seaborn-eda` | `src/analysis/eda_seaborn.py`, `images/eda/10_*`, `11_*` | Seaborn |
 | 8 | `feature/powerbi` | `src/export/export_powerbi.py`, `powerbi/` | Power BI |
-| 9 | `docs/ea2` | `docs/`, `README.md`, `.github/` | Req. 6 y 7 |
+| 9 | `feature/docs-ea2` | `README.md`, `docs/`, `.github/`, `notebooks/`, `scripts/` | Req. 6 y 7 |
+
+## Atajo: script automático
+
+El script `scripts/gitflow_ea2.ps1` hace todo lo de la tabla (crea `develop`, las 9 ramas y un commit por rama):
+
+```powershell
+.\scripts\gitflow_ea2.ps1 -Subir            # crea ramas y las sube a GitHub
+.\scripts\gitflow_ea2.ps1 -Subir -CrearPR    # además crea los Pull Requests (requiere GitHub CLI)
+```
+
+Luego fusiona los PR hacia `develop` en GitHub. Si prefieres hacerlo a mano, usa los comandos de abajo.
 
 ## Comandos
 
