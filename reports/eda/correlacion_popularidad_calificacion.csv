@@ -1,2 +1,3 @@
-correlacion_popularidad_calificacion
-0.0343
+tipo,n_titulos,spearman_popularidad_calificacion
+Movie,14183,0.2343
+TV Show,6148,0.1657

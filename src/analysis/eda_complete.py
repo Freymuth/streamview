@@ -112,18 +112,21 @@ def main():
     fig, ax = plt.subplots(figsize=(7, 5))
     for tipo, color in [("Movie", COLOR_MOVIE), ("TV Show", COLOR_TV)]:
         sub = muestra[muestra["type"] == tipo]
-        ax.scatter(sub["popularity"], sub["vote_average"], alpha=0.4, s=10, color=color, label=tipo)
+        ax.scatter(sub["popularity"], sub["calificacion"], alpha=0.4, s=10, color=color, label=tipo)
     ax.set_xscale("log")
     ax.set_xlabel("Popularidad (escala log)")
-    ax.set_ylabel("Calificación promedio")
+    ax.set_ylabel("Calificación (solo títulos con ≥ 10 votos)")
     ax.set_title("Popularidad vs. calificación de la audiencia")
     ax.legend()
     guardar_figura(fig, "06_popularidad_vs_calificacion")
 
-    correlacion = catalogo[["popularity", "vote_average"]].corr().iloc[0, 1]
-    pd.DataFrame({"correlacion_popularidad_calificacion": [round(correlacion, 4)]}).to_csv(
-        f"{REPORT_DIR}correlacion_popularidad_calificacion.csv", index=False
-    )
+    # Spearman por tipo (escalas de popularidad distintas, valores extremos) y solo
+    # sobre títulos con calificación confiable (>= 10 votos). Mismo criterio del dashboard.
+    filas = []
+    for tipo, g in catalogo.dropna(subset=["calificacion"]).groupby("type"):
+        filas.append({"tipo": tipo, "n_titulos": len(g),
+                      "spearman_popularidad_calificacion": round(g["popularity"].corr(g["calificacion"], method="spearman"), 4)})
+    pd.DataFrame(filas).to_csv(f"{REPORT_DIR}correlacion_popularidad_calificacion.csv", index=False)
 
     # =======================================================================
     # 3. ANÁLISIS TEMPORAL
@@ -137,6 +140,7 @@ def main():
     ax.plot(evolucion.index, evolucion["TV Show"], marker="o", color=COLOR_TV, label="TV Show", markersize=3)
     ax.set_xlabel("Año de estreno")
     ax.set_ylabel("Cantidad de títulos")
+    ax.set_ylim(0, evolucion.to_numpy().max() * 1.25)  # eje desde 0: un eje truncado exagera una caída de 9 títulos
     ax.set_title("Evolución histórica de estrenos por año")
     ax.legend()
     guardar_figura(fig, "07_evolucion_historica")
@@ -149,7 +153,7 @@ def main():
 
     # 4a. Presupuesto vs ingresos -> dispersión (relación entre 2 variables)
     fig, ax = plt.subplots(figsize=(7, 6))
-    sc = ax.scatter(financiero["budget"], financiero["revenue"], c=financiero["vote_average"],
+    sc = ax.scatter(financiero["budget"], financiero["revenue"], c=financiero["calificacion"],
                      cmap="viridis", alpha=0.6, s=15)
     ax.set_xscale("log")
     ax.set_yscale("log")
@@ -158,13 +162,13 @@ def main():
     ax.set_xlabel("Presupuesto (USD, escala log)")
     ax.set_ylabel("Ingresos (USD, escala log)")
     ax.set_title("Presupuesto vs. ingresos")
-    plt.colorbar(sc, label="Calificación")
+    plt.colorbar(sc, label="Calificación (≥ 10 votos)")
     ax.legend()
     guardar_figura(fig, "08_presupuesto_vs_ingresos")
 
     # 4b. Retorno de inversión -> barras horizontales (ranking Top-N),
     # excluyendo presupuestos irrealmente bajos que distorsionan el ranking.
-    fin_validos = financiero[financiero["budget"] >= 10_000]
+    fin_validos = financiero[financiero["presupuesto_realista"]]
     top_roi = fin_validos.sort_values("roi", ascending=False).head(15)
     fig, ax = plt.subplots(figsize=(8, 6))
     ax.barh(top_roi.sort_values("roi")["title"], top_roi.sort_values("roi")["roi"], color="#0D9488")
@@ -172,6 +176,14 @@ def main():
     ax.set_title("Top 15 títulos con mayor ROI\n(excluye presupuestos menores a $10.000)")
     guardar_figura(fig, "09_top_roi")
     top_roi[["title", "budget", "revenue", "roi"]].to_csv(f"{REPORT_DIR}top_roi.csv", index=False)
+
+    # 4c. Las tres formas de medir ROI (se documentan para no mezclarlas)
+    pd.DataFrame([
+        {"definicion": "ROI agregado (ingresos totales / presupuesto total)", "valor": financiero["revenue"].sum() / financiero["budget"].sum()},
+        {"definicion": "ROI mediano por película", "valor": financiero["roi"].median()},
+        {"definicion": "ROI promedio por película (presupuesto >= USD 10.000)", "valor": fin_validos["roi"].mean()},
+        {"definicion": "ROI promedio por película SIN filtrar (distorsionado)", "valor": financiero["roi"].mean()},
+    ]).round(2).to_csv(f"{REPORT_DIR}roi_definiciones.csv", index=False)
 
     print(f"\n✅ Gráficos guardados en {IMG_DIR}")
     print(f"✅ Reportes guardados en {REPORT_DIR}")

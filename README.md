@@ -1,4 +1,4 @@
-# StreamView Analytics — Visual Analytics del catálogo audiovisual (EA1 + EA2)
+# StreamView Analytics — Visual Analytics del catálogo audiovisual (EA1 + EA2 + EA3)
 
 Proyecto académico de Visualización de Datos (ADY1104, Duoc UC) — caso semestral StreamView Analytics.
 
@@ -6,7 +6,23 @@ Proyecto académico de Visualización de Datos (ADY1104, Duoc UC) — caso semes
 |---|---|---|
 | EA1 | Informe ejecutivo + EDA (8 visualizaciones) | ✅ [`docs/resultados_eda.md`](docs/resultados_eda.md) |
 | **EA2** | **Dashboards interactivos (Ejecutivo y Analítico) + integración Python / D3 / Power BI** | ✅ este repositorio |
-| EA3 | Evaluación crítica y rediseño | pendiente |
+| **EA3** | **Informe ejecutivo PDF, evaluación crítica, mejoras, resumen ejecutivo y presentación** | ✅ [`docs/Informe_Ejecutivo_StreamView_EA3.pdf`](docs/Informe_Ejecutivo_StreamView_EA3.pdf) |
+
+## EA3 — Entregables
+
+| Entregable | Archivo |
+|---|---|
+| Informe ejecutivo (PDF) | `docs/Informe_Ejecutivo_StreamView_EA3.pdf` |
+| Resumen ejecutivo (PDF) | `docs/Resumen_Ejecutivo_StreamView_EA3.pdf` |
+| Presentación de la defensa (PowerPoint, 11 diapositivas) | `docs/StreamView_Presentacion_EA3.pptx` |
+| Evaluación crítica | [`docs/evaluacion_critica.md`](docs/evaluacion_critica.md) |
+| Mejoras implementadas (antes → después) | [`docs/mejoras_ea3.md`](docs/mejoras_ea3.md) |
+| Conclusiones y recomendaciones | [`docs/conclusiones_recomendaciones.md`](docs/conclusiones_recomendaciones.md) |
+| Nueva página del dashboard: Calidad de datos y EDA | `dashboard/pages/3_Calidad_y_EDA.py` |
+| Notebook del análisis | `notebooks/01_analisis_completo.ipynb` |
+| Capturas de los dashboards | `images/dashboard/` |
+
+Los PDF se regeneran con `python src/export/build_informe.py`.
 
 ## EA2 — Qué incluye
 
@@ -25,6 +41,7 @@ Proyecto académico de Visualización de Datos (ADY1104, Duoc UC) — caso semes
 
 ```bash
 python -m venv .venv
+source .venv/bin/activate            # macOS / Linux
 .venv\Scripts\Activate.ps1          # Windows (PowerShell)
 pip install -r requirements.txt
 ```
@@ -33,14 +50,14 @@ pip install -r requirements.txt
 
 ```bash
 python src/data/clean_data.py                 # genera data/processed/ y reports/data_quality/
-streamlit run dashboard/app.py                # dashboards Ejecutivo y Analítico
+streamlit run dashboard/app.py                # dashboards Ejecutivo, Analítico y Calidad/EDA
 python dash_app/app.py                        # dashboard financiero en Dash (http://127.0.0.1:8050)
 python src/export/build_d3.py                 # d3/treemap_generos.html
 python src/export/export_powerbi.py           # powerbi/data/*.csv
 python src/analysis/eda_seaborn.py            # images/eda/10_*.png y 11_*.png
 ```
 
-Todo el flujo (limpieza, EDA, Seaborn, D3, Power BI) en un paso: `python notebooks/01_analisis_completo.py`.
+Todo el flujo (limpieza, EDA, Seaborn, D3, Power BI) en un paso: `python notebooks/01_analisis_completo.py` (o abre `notebooks/01_analisis_completo.ipynb`).
 Si `data/processed/` no existe, los dashboards lo generan solos al iniciar.
 
 ## Estructura
@@ -48,17 +65,17 @@ Si `data/processed/` no existe, los dashboards lo generan solos al iniciar.
 ```text
 streamview-analytics/
 |-- data/raw/                  # datasets oficiales (sin modificar)
-|-- data/processed/            # catalogo_limpio.csv, catalogo_financiero.csv (generados)
+|-- data/processed/            # catalogo_limpio.csv, catalogo_financiero.csv (incluidos; se regeneran con clean_data.py)
 |-- src/
 |   |-- common.py              # helpers compartidos (explotar listas, ISO-3, idiomas)
 |   |-- d3_treemap.py          # treemap D3 (Python -> JSON -> D3)
 |   |-- data/clean_data.py     # limpieza + reglas de negocio
 |   |-- analysis/              # eda_complete.py (EA1), eda_seaborn.py (EA2)
 |   `-- export/                # export_powerbi.py, build_d3.py
-|-- dashboard/                 # Streamlit: app.py (portada), utils.py, pages/1_Ejecutivo, 2_Analitico
+|-- dashboard/                 # Streamlit: app.py (portada), utils.py, pages/1_Ejecutivo, 2_Analitico, 3_Calidad_y_EDA
 |-- dash_app/app.py            # dashboard financiero en Dash
 |-- d3/treemap_generos.html    # treemap D3 autónomo
-|-- powerbi/                   # data/ (CSV estrella) + GUIA_POWERBI.md (+ StreamView.pbix que construyes tú)
+|-- powerbi/                   # data/ (CSV estrella), medidas DAX y GUIA_POWERBI.md (el .pbix se construye con la guía; no se incluye)
 |-- docs/                      # problema, limpieza, EDA, ética, EA2 (arquitectura, justificación, gitflow, guion)
 |-- reports/, images/, notebooks/
 `-- .github/pull_request_template.md

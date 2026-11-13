@@ -4,6 +4,7 @@ Portada del dashboard corporativo (Streamlit multipágina).
 
 Ejecutar desde la raíz del proyecto:  streamlit run dashboard/app.py
 Páginas:  1_Ejecutivo.py (Directorio y Gerencia General)
+          3_Calidad_y_EDA.py (Data & Analytics; EA3)
           2_Analitico.py (Gerencia de Contenidos y Adquisición)
 """
 
@@ -45,6 +46,14 @@ with col2:
         "películas rinden con presupuestos reducidos; incluye análisis financiero."
     )
     st.page_link("pages/2_Analitico.py", label="Abrir dashboard analítico", icon="➡️")
+
+st.divider()
+st.markdown("### 🧪 Calidad de datos y EDA")
+st.write(
+    "**Audiencia:** Data & Analytics y cualquier área que quiera saber qué tan confiable es un indicador.  \n"
+    "**Para qué:** ver datos faltantes, distribuciones, correlaciones y valores atípicos antes de decidir."
+)
+st.page_link("pages/3_Calidad_y_EDA.py", label="Abrir calidad de datos y EDA", icon="➡️")
 
 st.divider()
 with st.expander("Cómo leer estos dashboards (reglas de negocio del caso)", expanded=True):

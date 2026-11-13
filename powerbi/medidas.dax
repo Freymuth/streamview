@@ -1,0 +1,81 @@
+// ============================================================================
+// StreamView Analytics - Medidas DAX (Power BI Desktop)
+// Pegar cada medida con: Modelado > Nueva medida. Tabla sugerida: crear una tabla vacia
+// "Medidas" (Inicio > Introducir datos) para ordenarlas.
+// Requiere las relaciones descritas en GUIA_POWERBI.md.
+// ============================================================================
+
+// ---------------- KPIs del catalogo (Dashboard Ejecutivo) ----------------
+Total Contenidos = COUNTROWS ( fact_catalogo )
+
+Total Peliculas = CALCULATE ( [Total Contenidos], fact_catalogo[tipo] = "Película" )
+
+Total Series = CALCULATE ( [Total Contenidos], fact_catalogo[tipo] = "Serie" )
+
+Paises = DISTINCTCOUNT ( bridge_pais[pais] )
+
+Idiomas = DISTINCTCOUNT ( fact_catalogo[idioma] )
+
+Generos = DISTINCTCOUNT ( bridge_genero[genero] )
+
+Popularidad Promedio = AVERAGE ( fact_catalogo[popularidad] )
+
+// La columna calificacion ya viene vacia cuando el titulo tiene menos de 10 votos
+Calificacion Promedio = AVERAGE ( fact_catalogo[calificacion] )
+
+Titulos con Calificacion = COUNT ( fact_catalogo[calificacion] )
+
+Pct Peliculas = DIVIDE ( [Total Peliculas], [Total Contenidos] )
+
+// ---------------- Evolucion: estrenos e incorporacion ----------------
+// dim_calendario[anio] -> fact_catalogo[anio_estreno] (relacion activa)
+Estrenos = [Total Contenidos]
+
+// dim_calendario[anio] -> fact_catalogo[anio_incorporacion] (relacion INACTIVA)
+Incorporados =
+CALCULATE (
+    [Total Contenidos],
+    USERELATIONSHIP ( fact_catalogo[anio_incorporacion], dim_calendario[anio] )
+)
+
+// ---------------- Rankings (Dashboard Analitico) ----------------
+Titulos por Director = COUNTROWS ( bridge_director )
+
+Titulos por Actor = COUNTROWS ( bridge_actor )
+
+Votos Totales = SUM ( fact_catalogo[votos] )
+
+// Mapa de calificacion por pais: solo paises con al menos 20 titulos con calificacion valida
+Calificacion Pais Confiable =
+IF ( [Titulos con Calificacion] >= 20, [Calificacion Promedio] )
+
+// ---------------- Financiero (solo peliculas con presupuesto e ingresos) ----------------
+Peliculas con Datos Financieros = COUNTROWS ( fact_financiero )
+
+Presupuesto Promedio = AVERAGE ( fact_financiero[presupuesto] )
+
+Total Presupuesto = SUM ( fact_financiero[presupuesto] )
+
+Total Ingresos = SUM ( fact_financiero[ingresos] )
+
+// ROI aproximado = ingresos totales / presupuesto total
+ROI Aproximado = DIVIDE ( [Total Ingresos], [Total Presupuesto] )
+
+// Mediana por pelicula, sin presupuestos menores a USD 10.000
+ROI Mediano =
+MEDIANX (
+    FILTER ( fact_financiero, fact_financiero[presupuesto_realista] = TRUE ()),
+    fact_financiero[roi]
+)
+
+Cobertura Financiera = DIVIDE ( [Peliculas con Datos Financieros], [Total Peliculas] )
+
+// Nota visible exigida por el encargo (ponerla en una tarjeta o cuadro de texto dinamico)
+Nota Financiera =
+"Este análisis solo incluye películas con presupuesto e ingresos informados: "
+    & FORMAT ( [Peliculas con Datos Financieros], "#,0" )
+    & " de "
+    & FORMAT ( [Total Peliculas], "#,0" )
+    & " películas ("
+    & FORMAT ( [Cobertura Financiera], "0.0%" )
+    & ")."

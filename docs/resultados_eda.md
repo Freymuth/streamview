@@ -26,24 +26,30 @@ estrenados entre 2010 y 2025.
 - La popularidad normalizada (`popularity_norm`) permite comparar películas y
   series en la misma escala (0-1), controlando por el hecho de que sus rangos
   de popularidad originales no son comparables — `images/eda/05_comparativa_popularidad.png`.
-- La calificación promedio del catálogo es **5,69 sobre 10**, y la popularidad
-  promedio es **42,63** (índice relativo TMDB, no representa reproducciones).
-- La correlación entre popularidad y calificación es **0,03** — prácticamente
-  nula. Esto es un hallazgo relevante: un contenido puede ser muy buscado
-  (popular) sin ser necesariamente bien evaluado por la audiencia, y viceversa
-  — `images/eda/06_popularidad_vs_calificacion.png`.
+- La calificación promedio del catálogo es **6,63 sobre 10** (calculada solo
+  sobre los 20.331 títulos con 10 o más votos; el 5,69 de la primera versión
+  incluía 4.560 títulos sin votos como «nota 0»). Películas: **6,35**; series:
+  **7,29**. La popularidad promedio es **42,6** (índice relativo TMDB, no
+  representa reproducciones).
+- La correlación de Spearman entre popularidad y calificación es **débil**:
+  **0,23 en películas** y **0,17 en series**. Un contenido puede ser muy
+  buscado sin ser bien evaluado, y viceversa: la popularidad no sirve como
+  sustituto de la calidad — `images/eda/06_popularidad_vs_calificacion.png`,
+  `reports/eda/correlacion_popularidad_calificacion.csv`.
 
 ## 3. Evolución temporal
 
-El catálogo muestra una tendencia de crecimiento sostenido en el número de
-estrenos incorporados año a año entre 2010 y 2025, tanto en películas como en
-series — `images/eda/07_evolucion_historica.png`. El detalle año por año está
-en `reports/eda/evolucion_historica.csv`.
+El extracto contiene **≈2.000 títulos por año** (≈1.000 películas y ≈1.000
+series) entre 2010 y 2025: la evolución es **plana**. Es una característica del
+extracto entregado, **no un hallazgo de negocio**, y no debe leerse como
+crecimiento ni estancamiento real — `images/eda/07_evolucion_historica.png`. El
+detalle año por año está en `reports/eda/evolucion_historica.csv`.
 
 ## 4. Análisis financiero (solo películas con datos completos)
 
 - Solo **3.540 de 31.991 títulos (11%)** tienen presupuesto e ingresos
-  conocidos; todo lo que sigue se calcula únicamente sobre ese subconjunto.
+  conocidos (equivale al **22% de las 16.000 películas**, porque las series no
+  traen datos financieros); todo lo que sigue se calcula únicamente sobre ese subconjunto.
 - Presupuesto promedio: **USD 35,6 millones**. Ingresos totales acumulados:
   **USD 367.371 millones**.
 - La relación presupuesto-ingresos es visible en
@@ -55,9 +61,14 @@ en `reports/eda/evolucion_historica.csv`.
   presupuestos declarados extremadamente bajos (cercanos a USD 1), lo que
   produce valores de ROI artificialmente enormes (ROI promedio sin filtrar:
   **781x**). Al excluir presupuestos menores a USD 10.000 —probablemente datos
-  mal cargados o placeholders—, el ROI promedio baja a un valor mucho más
-  creíble de **4,2x**. El ranking de Top 15 ROI
-  (`images/eda/09_top_roi.png`, `reports/eda/top_roi.csv`) usa este filtro.
+  mal cargados o placeholders—, el ROI promedio baja a **4,2x**. El ranking de
+  Top 15 ROI (`images/eda/09_top_roi.png`, `reports/eda/top_roi.csv`) usa este filtro.
+- **Tres formas de medir ROI (no mezclarlas)** — `reports/eda/roi_definiciones.csv`:
+  ROI *agregado* (ingresos totales / presupuesto total) = **2,9x**, que es el
+  que usan los dashboards y Power BI; ROI *mediano* por película = **1,7x**;
+  ROI *promedio* por película con presupuesto ≥ USD 10.000 = **4,2x** (lo
+  inflan pocos éxitos de bajo costo). Aproximadamente **37%** de las películas
+  no recupera su presupuesto (ROI < 1).
 
 ## Limitaciones
 
